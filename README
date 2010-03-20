@@ -13,9 +13,10 @@ http://michael.dipperstein.com/trim.html
 FILES
 -----
 COPYING         - Rules for copying and distributing GPL software
-getopt.c        - LGPL version of getopt source from GNU project
-getopt.h        - LGPL version of getopt headers from GNU project
+COPYING.LESSER  - Rules for copying and distributing LGPL software
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
+optlist.c       - Source code for GetOptlist function and supporting functions
+optlist.h       - Header file to be included by code using the optlist library
 README          - this file
 trim.c          - Main functions for this program
 
@@ -41,6 +42,8 @@ Default: trim -t4 -i stdin -o stdout
 HISTORY
 -------
 12/30/06  - Initial release
+08/31/07  - Explicitly licensed under LGPL version 3.
+          - Replaces getopt() with optlist library.
 
 TODO
 ----

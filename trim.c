@@ -9,8 +9,12 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: trim.c,v 1.1.1.1 2006/12/31 06:14:58 michael Exp $
+*   $Id: trim.c,v 1.2 2007/09/30 04:54:41 michael Exp $
 *   $Log: trim.c,v $
+*   Revision 1.2  2007/09/30 04:54:41  michael
+*   Replace getopt with optlist.
+*   Changes required for LGPL v3.
+*
 *   Revision 1.1.1.1  2006/12/31 06:14:58  michael
 *   Initial Release
 *
@@ -18,23 +22,23 @@
 ****************************************************************************
 *
 * Trim: A tab removal and trailing space trimmer
-* Copyright (C) 2006 by Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
+* Copyright (C) 2006, 2007 by
+*       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
 *
 * This file is part of Trim.
 *
-* Trim is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
+* Trim is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Lesser General Public License as published by the
+* Free Software Foundation; either version 3 of the License, or (at your
+* option) any later version.
 *
-* Trim is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+* Trim is distributed in the hope that it will be useful, but WITHOUT ANY
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+* License for more details.
 *
-* You should have received a copy of the GNU General Public License
-* along with Trim; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 
@@ -45,7 +49,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <getopt.h>
+#include <optlist.h>
 
 /***************************************************************************
 *                                CONSTANTS
@@ -83,8 +87,9 @@ int main(int argc, char *argv[])
     FILE *fpIn, *fpOut;
     char *inFile, *outFile;
     char *line;
-    int opt, c, pos;
+    int c, pos;
     unsigned int lineSize, tabSize;
+    option_t *optList, *thisOpt;
 
     /* initialize variables */
     inFile = NULL;
@@ -93,7 +98,7 @@ int main(int argc, char *argv[])
 
     lineSize = LINE_BLOCK;
     line  = (char *)malloc(lineSize * sizeof(char));
-    
+
     if (NULL == line)
     {
         perror("Memory allocation");
@@ -101,12 +106,15 @@ int main(int argc, char *argv[])
     }
 
     /* parse command line */
-    while ((opt = getopt(argc, argv, "t:i:o:h?")) != -1)
+    optList = GetOptList(argc, argv, "t:i:o:h?");
+    thisOpt = optList;
+
+    while (thisOpt != NULL)
     {
-        switch(opt)
+        switch(thisOpt->option)
         {
             case 't':       /* compression mode */
-                tabSize = atoi(optarg);
+                tabSize = atoi(thisOpt->argument);
                 break;
 
             case 'i':       /* input file name */
@@ -120,9 +128,11 @@ int main(int argc, char *argv[])
                         free(outFile);
                     }
 
+                    FreeOptList(optList);
                     return EXIT_FAILURE;
                 }
-                else if ((inFile = (char *)malloc(strlen(optarg) + 1)) == NULL)
+                else if ((inFile =
+                    (char *)malloc(strlen(thisOpt->argument) + 1)) == NULL)
                 {
                     perror("Memory allocation");
 
@@ -131,10 +141,11 @@ int main(int argc, char *argv[])
                         free(outFile);
                     }
 
+                    FreeOptList(optList);
                     return EXIT_FAILURE;
                 }
 
-                strcpy(inFile, optarg);
+                strcpy(inFile, thisOpt->argument);
                 break;
 
             case 'o':       /* output file name */
@@ -148,9 +159,11 @@ int main(int argc, char *argv[])
                         free(inFile);
                     }
 
+                    FreeOptList(optList);
                     return EXIT_FAILURE;
                 }
-                else if ((outFile = (char *)malloc(strlen(optarg) + 1)) == NULL)
+                else if ((outFile =
+                    (char *)malloc(strlen(thisOpt->argument) + 1)) == NULL)
                 {
                     perror("Memory allocation");
 
@@ -159,10 +172,11 @@ int main(int argc, char *argv[])
                         free(inFile);
                     }
 
+                    FreeOptList(optList);
                     return EXIT_FAILURE;
                 }
 
-                strcpy(outFile, optarg);
+                strcpy(outFile, thisOpt->argument);
                 break;
 
             case 'h':
@@ -175,8 +189,14 @@ int main(int argc, char *argv[])
                 printf("  -h | ?  : Print out command line options.\n\n");
                 printf("Default: %s -t4 -i stdin -o stdout\n",
                     RemovePath(argv[0]));
+
+                FreeOptList(optList);
                 return EXIT_SUCCESS;
         }
+
+        optList = thisOpt->next;
+        free(thisOpt);
+        thisOpt = optList;
     }
 
     /* open file to be trimmed */
@@ -243,7 +263,7 @@ int main(int argc, char *argv[])
                         /* need a longer line for storage */
                         lineSize += LINE_BLOCK;
                         line  = (char *)realloc(line, lineSize * sizeof(char));
-    
+
                         if (NULL == line)
                         {
                             perror("Memory allocation");
