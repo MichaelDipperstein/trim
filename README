@@ -5,15 +5,14 @@ an ANSI C space trimmer and tab removal program.  It replace tab characters
 with enough spaces to reach the next tab stop.  Any trailing spaces will also
 be removed.
 
-Trim is released on the GNU GPL.
+Trim is licensed under version 3 of the GNU GPL.
 
 The latest revision of this program may be found at:
-http://michael.dipperstein.com/trim.html
+http://michael.dipperstein.com/trim/index.html
 
 FILES
 -----
 COPYING         - Rules for copying and distributing GPL software
-COPYING.LESSER  - Rules for copying and distributing LGPL software
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
 optlist.c       - Source code for GetOptlist function and supporting functions
 optlist.h       - Header file to be included by code using the optlist library

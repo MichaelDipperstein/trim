@@ -9,8 +9,17 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: trim.c,v 1.2 2007/09/30 04:54:41 michael Exp $
+*   $Id: trim.c,v 1.5 2008/01/22 05:36:48 michael Exp $
 *   $Log: trim.c,v $
+*   Revision 1.5  2008/01/22 05:36:48  michael
+*   Correct comment and include statement.
+*
+*   Revision 1.4  2008/01/05 04:53:37  michael
+*   Don't free NULL input/output file name pointers.
+*
+*   Revision 1.3  2007/12/05 05:59:00  michael
+*   Use correct license text for GPL.
+*
 *   Revision 1.2  2007/09/30 04:54:41  michael
 *   Replace getopt with optlist.
 *   Changes required for LGPL v3.
@@ -28,16 +37,16 @@
 * This file is part of Trim.
 *
 * Trim is free software; you can redistribute it and/or modify it under
-* the terms of the GNU Lesser General Public License as published by the
+* the terms of the GNU General Public License as published by the
 * Free Software Foundation; either version 3 of the License, or (at your
 * option) any later version.
 *
-* Trim is distributed in the hope that it will be useful, but WITHOUT ANY
+* Trim is distributed in the hope that it will be useful, but WITHOUT
 * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
 * License for more details.
 *
-* You should have received a copy of the GNU Lesser General Public License
+* You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
@@ -49,7 +58,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <optlist.h>
+#include "optlist.h"
 
 /***************************************************************************
 *                                CONSTANTS
@@ -113,7 +122,7 @@ int main(int argc, char *argv[])
     {
         switch(thisOpt->option)
         {
-            case 't':       /* compression mode */
+            case 't':       /* number of spaces in a tab */
                 tabSize = atoi(thisOpt->argument);
                 break;
 
@@ -203,13 +212,12 @@ int main(int argc, char *argv[])
     if (NULL != inFile)
     {
         fpIn = fopen(inFile, "r");
+        free(inFile);
     }
     else
     {
         fpIn = stdin;
     }
-
-    free(inFile);
 
     if (NULL == fpIn)
     {
@@ -222,13 +230,12 @@ int main(int argc, char *argv[])
     if (NULL != outFile)
     {
         fpOut = fopen(outFile, "w");
+        free(outFile);
     }
     else
     {
         fpOut = stdout;
     }
-
-    free(outFile);
 
     if (NULL == fpOut)
     {
