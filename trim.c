@@ -7,47 +7,25 @@
 *   Date    : November 26, 2006
 *
 ****************************************************************************
-*   UPDATES
-*
-*   $Id: trim.c,v 1.5 2008/01/22 05:36:48 michael Exp $
-*   $Log: trim.c,v $
-*   Revision 1.5  2008/01/22 05:36:48  michael
-*   Correct comment and include statement.
-*
-*   Revision 1.4  2008/01/05 04:53:37  michael
-*   Don't free NULL input/output file name pointers.
-*
-*   Revision 1.3  2007/12/05 05:59:00  michael
-*   Use correct license text for GPL.
-*
-*   Revision 1.2  2007/09/30 04:54:41  michael
-*   Replace getopt with optlist.
-*   Changes required for LGPL v3.
-*
-*   Revision 1.1.1.1  2006/12/31 06:14:58  michael
-*   Initial Release
-*
-*
-****************************************************************************
 *
 * Trim: A tab removal and trailing space trimmer
-* Copyright (C) 2006, 2007 by
+* Copyright (C) 2006, 2007, 2010 by
 *       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
 *
 * This file is part of Trim.
 *
 * Trim is free software; you can redistribute it and/or modify it under
-* the terms of the GNU General Public License as published by the
-* Free Software Foundation; either version 3 of the License, or (at your
+* the terms of the GNU General Public License as published by the Free
+* Software Foundation; either version 3 of the License, or (at your
 * option) any later version.
 *
-* Trim is distributed in the hope that it will be useful, but WITHOUT
+* Trim is distributed in the hope that it will be useful, but WITHOUT ANY
 * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-* License for more details.
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+* for more details.
 *
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* You should have received a copy of the GNU General Public License along
+* with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 
@@ -58,12 +36,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "optlist.h"
+#include <optlist.h>
 
 /***************************************************************************
 *                                CONSTANTS
 ***************************************************************************/
-#define LINE_BLOCK  80
 #define DEFAULT_TAB 4
 
 /***************************************************************************
@@ -95,35 +72,30 @@ int main(int argc, char *argv[])
 {
     FILE *fpIn, *fpOut;
     char *inFile, *outFile;
-    char *line;
-    int c, pos;
-    unsigned int lineSize, tabSize;
+    int c, pos, spaces;
+    unsigned int tabSize, keepTabs;
     option_t *optList, *thisOpt;
 
     /* initialize variables */
     inFile = NULL;
     outFile = NULL;
     tabSize = DEFAULT_TAB;
-
-    lineSize = LINE_BLOCK;
-    line  = (char *)malloc(lineSize * sizeof(char));
-
-    if (NULL == line)
-    {
-        perror("Memory allocation");
-        return EXIT_FAILURE;
-    }
+    keepTabs = 0;
 
     /* parse command line */
-    optList = GetOptList(argc, argv, "t:i:o:h?");
+    optList = GetOptList(argc, argv, "t:ki:o:h?");
     thisOpt = optList;
 
     while (thisOpt != NULL)
     {
         switch(thisOpt->option)
         {
-            case 't':       /* number of spaces in a tab */
+            case 't':       /* tab size */
                 tabSize = atoi(thisOpt->argument);
+                break;
+
+            case 'k':       /* keep tabs; don't convert them to spaces */
+                keepTabs = 1;
                 break;
 
             case 'i':       /* input file name */
@@ -192,7 +164,8 @@ int main(int argc, char *argv[])
             case '?':
                 printf("Usage: %s <options>\n\n", RemovePath(argv[0]));
                 printf("Options:\n");
-                printf("  -t : tab size.\n");
+                printf("  -t : Tab size.\n");
+                printf("  -k : Keep tabs.  Do not convert them to spaces.\n");
                 printf("  -i <filename> : Name of input file.\n");
                 printf("  -o <filename> : Name of output file.\n");
                 printf("  -h | ?  : Print out command line options.\n\n");
@@ -212,12 +185,13 @@ int main(int argc, char *argv[])
     if (NULL != inFile)
     {
         fpIn = fopen(inFile, "r");
-        free(inFile);
     }
     else
     {
         fpIn = stdin;
     }
+
+    free(inFile);
 
     if (NULL == fpIn)
     {
@@ -230,12 +204,13 @@ int main(int argc, char *argv[])
     if (NULL != outFile)
     {
         fpOut = fopen(outFile, "w");
-        free(outFile);
     }
     else
     {
         fpOut = stdout;
     }
+
+    free(outFile);
 
     if (NULL == fpOut)
     {
@@ -243,96 +218,69 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    /* expand tabs and trim 1 line at a time  */
-    while(!feof(fpIn))
+    pos = 0;
+    spaces = 0;
+
+    /* copy file 1 character at a time, replacing tabs and trimming spaces */
+    while ((c = fgetc(fpIn)) != EOF)
     {
-        /* initialize line */
-        pos = 0;
-        line[0] = '\0';
-
-        /* look for tabs to expand */
-        while ((c = fgetc(fpIn)) != '\n')
+        switch (c)
         {
-            if (EOF == c)
-            {
+            case '\n':
+                pos = 0;
+                spaces = 0;
+                fputc(c, fpOut);
                 break;
-            }
-            else if ('\t' == c)
-            {
-                /* found a tab, expand it */
-                do
+
+            case '\t':
+                if (keepTabs)
                 {
-                    line[pos] = ' ';
+                    if (0 == spaces)
+                    {
+                        /* I could use the else clause, but this is faster */
+                        fputc('\t', fpOut);
+                    }
+                    else
+                    {
+                        /* write out leading spaces too */
+                        fprintf(fpOut, "%*c", spaces + 1, c);
+                        spaces = 0;
+                    }
+
                     pos++;
-
-                    if (pos == lineSize)
-                    {
-                        /* need a longer line for storage */
-                        lineSize += LINE_BLOCK;
-                        line  = (char *)realloc(line, lineSize * sizeof(char));
-
-                        if (NULL == line)
-                        {
-                            perror("Memory allocation");
-                            return EXIT_FAILURE;
-                        }
-                    }
-                } while (pos % tabSize);
-            }
-            else
-            {
-                line[pos] = c;
-                pos++;
-
-                if (pos == lineSize)
-                {
-                    /* need a longer line for storage */
-                    lineSize += LINE_BLOCK;
-                    line  = (char *)realloc(line, lineSize * sizeof(char));
-
-                    if (NULL == line)
-                    {
-                        perror("Memory allocation");
-                        return EXIT_FAILURE;
-                    }
-                }
-            }
-        }
-
-        /* remove all white space from the end of the line */
-        if ((EOF != c) || (0 != pos))
-        {
-            line[pos] = '\0';
-            pos--;
-
-            while (isspace(line[pos]))
-            {
-                line[pos] = '\0';
-
-                if (pos > 0)
-                {
-                    pos--;
                 }
                 else
                 {
-                    break;
+                    /* convert tab to spaces; compute width of tab */
+                    c = tabSize - (pos % tabSize);
+                    spaces += c;
+                    pos += c;
                 }
-            }
+                break;
 
-            if ('\n' == c)
-            {
-                /* write out line + removed '\n' */
-                fprintf(fpOut, "%s\n", line);
-            }
-            else
-            {
-                /* write out line without '\n' */
-                fprintf(fpOut, "%s", line);
-            }
+            case ' ':
+                spaces++;
+                pos++;
+                break;
+
+            default:
+                if (0 == spaces)
+                {
+                    /* I could use the else clause, but this is faster */
+                    fputc(c, fpOut);
+                }
+                else
+                {
+                    /* write out leading spaces too */
+                    fprintf(fpOut, "%*c", spaces + 1, c);
+                    spaces = 0;
+                }
+
+                pos++;
+                break;
         }
     }
 
-    free(line);
     fclose(fpIn);
     fclose(fpOut);
     return EXIT_SUCCESS;

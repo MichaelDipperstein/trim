@@ -3,16 +3,17 @@ DESCRIPTION
 This archive contains the source code and supporting documentation for trim,
 an ANSI C space trimmer and tab removal program.  It replace tab characters
 with enough spaces to reach the next tab stop.  Any trailing spaces will also
-be removed.
+be removed, and native line endings will be used.
 
-Trim is licensed under version 3 of the GNU GPL.
+Trim is released under the GNU GPL.
 
 The latest revision of this program may be found at:
-http://michael.dipperstein.com/trim/index.html
+http://michael.dipperstein.com/trim.html
 
 FILES
 -----
 COPYING         - Rules for copying and distributing GPL software
+COPYING.LESSER  - Rules for copying and distributing LGPL software
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
 optlist.c       - Source code for GetOptlist function and supporting functions
 optlist.h       - Header file to be included by code using the optlist library
@@ -31,7 +32,8 @@ USAGE
 Usage: trim <options>
 
 Options:
-  -t : tab size.
+  -t : Tab size.
+  -k : Keep tabs.  Do not convert them to spaces.
   -i <filename> : Name of input file.
   -o <filename> : Name of output file.
   -h | ?  : Print out command line options.
@@ -43,12 +45,20 @@ HISTORY
 12/30/06  - Initial release
 08/31/07  - Explicitly licensed under LGPL version 3.
           - Replaces getopt() with optlist library.
+10/01/10  - Writes output 1 character at a time instead of 1 line at a time.
+            This requires less system memory.
+          - Added "Keep Tabs" mode, -k.
+          - Changed license to GPL (was LGPL).
 
 TODO
 ----
 - Allow tab stop columns to be specified
 - Add features found in source beautification programs
 - Add a space to tab feature for crazy people that prefer tabs
+
+BUGS
+----
+- "Keep Tabs" mode even keeps tabs after last non-whitespace.
 
 AUTHOR
 ------
