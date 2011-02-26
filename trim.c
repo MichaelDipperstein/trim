@@ -78,7 +78,9 @@ int main(int argc, char *argv[])
 
     /* initialize variables */
     inFile = NULL;
+    fpIn = stdin;
     outFile = NULL;
+    fpOut = stdout;
     tabSize = DEFAULT_TAB;
     keepTabs = 0;
 
@@ -186,10 +188,6 @@ int main(int argc, char *argv[])
     {
         fpIn = fopen(inFile, "r");
     }
-    else
-    {
-        fpIn = stdin;
-    }
 
     free(inFile);
 
@@ -204,10 +202,6 @@ int main(int argc, char *argv[])
     if (NULL != outFile)
     {
         fpOut = fopen(outFile, "w");
-    }
-    else
-    {
-        fpOut = stdout;
     }
 
     free(outFile);
@@ -227,6 +221,8 @@ int main(int argc, char *argv[])
         switch (c)
         {
             case '\n':
+            case '\r':
+                /* end of line (maybe other OS format) */
                 pos = 0;
                 spaces = 0;
                 fputc(c, fpOut);
