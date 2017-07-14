@@ -13,12 +13,10 @@ http://michael.dipperstein.com/trim.html
 FILES
 -----
 COPYING         - Rules for copying and distributing GPL software
-COPYING.LESSER  - Rules for copying and distributing LGPL software
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
-optlist.c       - Source code for GetOptlist function and supporting functions
-optlist.h       - Header file to be included by code using the optlist library
 README          - this file
 trim.c          - Main functions for this program
+/optlist        - Subtree containing optlist command line option parser library
 
 BUILDING
 --------
@@ -49,6 +47,8 @@ HISTORY
             This requires less system memory.
           - Added "Keep Tabs" mode, -k.
           - Changed license to GPL (was LGPL).
+07/13/17  - Reorganized for ease of use with git/github
+          - optlist is now a subtree
 
 TODO
 ----

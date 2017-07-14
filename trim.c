@@ -9,7 +9,7 @@
 ****************************************************************************
 *
 * Trim: A tab removal and trailing space trimmer
-* Copyright (C) 2006, 2007, 2010 by
+* Copyright (C) 2006, 2007, 2010, 2017 by
 *       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
 *
 * This file is part of Trim.
@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <optlist.h>
+#include "optlist/optlist.h"
 
 /***************************************************************************
 *                                CONSTANTS
