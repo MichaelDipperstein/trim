@@ -16,7 +16,7 @@ COPYING         - Rules for copying and distributing GPL software
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
 README          - this file
 trim.c          - Main functions for this program
-/optlist        - Subtree containing optlist command line option parser library
+optlist/        - Subtree containing optlist command line option parser library
 
 BUILDING
 --------

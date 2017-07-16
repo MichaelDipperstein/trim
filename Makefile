@@ -22,15 +22,15 @@ else	#assume Linux/Unix
 	DEL = rm
 endif
 
-all:		trim$(EXE) optlist\liboptlist.a
+all:		trim$(EXE) optlist/liboptlist.a
 
-trim$(EXE):	trim.o optlist\liboptlist.a
+trim$(EXE):	trim.o optlist/liboptlist.a
 		$(LD) $< $(LIBS) $(LDFLAGS) $@
 
 trim.o:		trim.c optlist/optlist.h
 		$(CC) $(CFLAGS) $<
 
-optlist\liboptlist.a:
+optlist/liboptlist.a:
 		cd optlist && $(MAKE) liboptlist.a
 
 clean:
