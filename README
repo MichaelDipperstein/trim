@@ -25,6 +25,11 @@ To build these files with GNU make and gcc:
    Windows_NT.  This is often already done.
 2. Enter the command "make" from the command line.
 
+GIT NOTE: Updates to the optlist subtree don't get pulled by "git pull"
+Use the following commands to pull its updates:
+git subtree pull --prefix optlist https://github.com/MichaelDipperstein/optlist.git master --squash
+
+
 USAGE
 -----
 Usage: trim <options>
@@ -62,4 +67,4 @@ BUGS
 
 AUTHOR
 ------
-Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
+Michael Dipperstein (mdipperstein@gmail.com)

@@ -10,7 +10,7 @@
 *
 * Trim: A tab removal and trailing space trimmer
 * Copyright (C) 2006, 2007, 2010, 2017 by
-*       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
+*       Michael Dipperstein (mdipperstein@gmail.com)
 *
 * This file is part of Trim.
 *
